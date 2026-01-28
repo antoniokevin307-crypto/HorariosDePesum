@@ -1,0 +1,71 @@
+:root {
+  --bg: #0f172a;
+  --nav: #020617;
+  --card: #1e293b;
+  --text: #f8fafc;
+  --accent: #ec4899;
+  --nav-text: #ffffff;
+}
+
+body.tema-azul {
+  --bg: #f8fafc;
+  --nav: #e2e8f0;
+  --card: #ffffff;
+  --text: #020617;
+  --accent: #2563eb;
+  --nav-text: #020617;
+}
+
+body.tema-rosa-blanco {
+  --bg: #fff1f2;
+  --nav: #ffe4e6;
+  --card: #ffffff;
+  --text: #020617;
+  --accent: #ec4899;
+  --nav-text: #020617;
+}
+
+body.tema-verde {
+  --bg: #ecfdf5;
+  --nav: #d1fae5;
+  --card: #ffffff;
+  --text: #020617;
+  --accent: #22c55e;
+  --nav-text: #020617;
+}
+
+/* ============================================
+   ASEGURAR CONTRASTE EN TEMAS CLAROS
+   ============================================ */
+
+body.tema-azul,
+body.tema-rosa-blanco,
+body.tema-verde {
+  color: #020617 !important;
+}
+
+body.tema-azul * ,
+body.tema-rosa-blanco * ,
+body.tema-verde * {
+  color: #020617 !important;
+}
+
+/* Excluir elementos que usan colores específicos */
+body.tema-azul .message,
+body.tema-rosa-blanco .message,
+body.tema-verde .message {
+  color: white !important;
+}
+
+body.tema-azul input,
+body.tema-azul select,
+body.tema-azul textarea,
+body.tema-rosa-blanco input,
+body.tema-rosa-blanco select,
+body.tema-rosa-blanco textarea,
+body.tema-verde input,
+body.tema-verde select,
+body.tema-verde textarea {
+  color: #000000 !important;
+  background: #ffffff !important;
+}

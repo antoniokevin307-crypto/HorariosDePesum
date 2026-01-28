@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pensum – Ingeniería en Sistemas</title>
+
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="themes.css">
+  <link rel="stylesheet" href="animations.css">
+  <link rel="stylesheet" href="schedule.css">
+
+  <!-- Librería jsPDF para exportación a PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- jsPDF-autoTable para tablas en PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+
+<nav class="navbar">
+  <h1>Pensum Ingeniería en Sistemas</h1>
+
+  <div class="nav-controls">
+    <select id="themeSelector" class="theme-selector">
+      <option value="rosa">🎨 Default</option>
+      <option value="azul">🎨 Azul + Blanco</option>
+      <option value="rosa-blanco">🎨 Rosa + Blanco</option>
+      <option value="verde">🎨 Verde + Blanco</option>
+    </select>
+
+    <button id="resetBtn" class="btn-reset" title="Reiniciar todas las materias">↻ Reiniciar</button>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="pensum">📚 Pensum</button>
+      <button class="nav-tab" data-tab="schedule">📅 Horarios</button>
+    </div>
+  </div>
+</nav>
+
+<section class="progress-container" id="progressContainer">
+  <div class="progress-bar">
+    <div id="progress"></div>
+  </div>
+  <span id="progressText"></span>
+</section>
+
+<main>
+  <div id="pensumContainer" class="tab-content active"></div>
+  <div id="scheduleContainer" class="tab-content"></div>
+</main>
+
+<!-- Scripts: Storage y Datos -->
+<script src="data.js"></script>
+<script src="storage.js"></script>
+
+<!-- Scripts: Módulo de Horarios -->
+<script src="schedule.js"></script>
+<script src="scheduleUI.js"></script>
+<script src="schedulePDF.js"></script>
+
+<!-- Scripts: UI y App principal -->
+<script src="ui.js"></script>
+<script src="app.js"></script>
+
+<!-- Script de inicialización del módulo de horarios -->
+<script>
+  // Esperar a que el DOM esté listo
+  document.addEventListener('DOMContentLoaded', function() {
+    // Renderizar el módulo de horarios
+    ScheduleUI_Instance.renderScheduleModule();
+
+    // Botón de reset
+    const resetBtn = document.getElementById('resetBtn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function() {
+        if (confirm('¿Estás seguro de que deseas reiniciar TODAS las materias? Esta acción no se puede deshacer.')) {
+          Storage.saveCompleted([]);
+          if (Storage.saveNotes) Storage.saveNotes({});
+          renderPensum();
+          showMessage('🔄 Todas las materias han sido reiniciadas', 'info');
+        }
+      });
+    }
+
+    // Selector de temas
+    const themeSelector = document.getElementById('themeSelector');
+    if (themeSelector) {
+      // Cargar tema guardado
+      const savedTheme = localStorage.getItem('theme') || 'rosa';
+      themeSelector.value = savedTheme;
+      applyTheme(savedTheme);
+      
+      // Escuchar cambios
+      themeSelector.addEventListener('change', function() {
+        const theme = this.value;
+        applyTheme(theme);
+        localStorage.setItem('theme', theme);
+      });
+    }
+
+    // Gestión de tabs
+    const tabs = document.querySelectorAll('.nav-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        
+        // Actualizar tabs activos
+        tabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+
+        // Actualizar contenido visible
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+
+        if (tabName === 'pensum') {
+          document.getElementById('pensumContainer').classList.add('active');
+          document.getElementById('progressContainer').style.display = 'block';
+        } else if (tabName === 'schedule') {
+          document.getElementById('scheduleContainer').classList.add('active');
+          document.getElementById('progressContainer').style.display = 'none';
+          // Re-renderizar horarios al volver a la tab
+          ScheduleUI_Instance.renderScheduleModule();
+        }
+      });
+    });
+
+    // Manejar exportación a PDF
+    const exportBtn = document.getElementById('exportPdfBtn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', function() {
+        SchedulePDF.exportScheduleToPDF();
+      });
+    }
+  });
+
+  /**
+   * Aplica el tema seleccionado
+   */
+  function applyTheme(theme) {
+    // Remover todas las clases de tema
+    document.body.classList.remove('tema-azul', 'tema-rosa-blanco', 'tema-verde');
+    
+    // Aplicar el nuevo tema
+    switch(theme) {
+      case 'azul':
+        document.body.classList.add('tema-azul');
+        break;
+      case 'rosa-blanco':
+        document.body.classList.add('tema-rosa-blanco');
+        break;
+      case 'verde':
+        document.body.classList.add('tema-verde');
+        break;
+      default: // rosa
+        // El tema rosa es el por defecto (sin clase)
+        break;
+    }
+  }
+</script>
+
+</body>
+</html>
